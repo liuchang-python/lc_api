@@ -18,6 +18,9 @@ Vue.config.productionTip = false
 import settings from "./settings";
 Vue.prototype.$settings = settings;
 
+// 配置极验js
+import "../static/js/gt"
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
