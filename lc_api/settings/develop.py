@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+import datetime
 import os
 import sys
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reversion',
 
     'home',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'lc_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "lc_api",
+        'NAME': "api_lc",
         'HOST': "127.0.0.1",
         'PORT': 3306,
         'USER': "root",
@@ -119,7 +120,7 @@ LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_L10N = True
 
@@ -137,10 +138,26 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # 允许跨域请求
 CORS_ORIGIN_ALLOW_ALL = True
 
+JWT_AUTH = {
+    # jwt 登录视图返回的数据的格式
+    'JWT_RESPONSE_PAYLOAD_HANDLER':
+        'user.utils.jwt_response_payload_handler',
+    # token的过期时间
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+}
+
+# 自定义多条件登录方式
+AUTHENTICATION_BACKENDS = [
+    'user.utils.UserAuthBackend'
+]
+
 REST_FRAMEWORK = {
     # 全局异常配置
-    "EXCEPTION_HANDLER": "utils.exceptions.exception_handler",
+    "EXCEPTION_HANDLER": "lc_api.utils.exceptions.exception_handler",
 }
+
+# 注册自定义用户模型
+AUTH_USER_MODEL = "user.UserInfo"
 
 # 日志配置
 LOGGING = {
