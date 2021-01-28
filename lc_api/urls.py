@@ -26,9 +26,12 @@ xversion.register_models()
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('admin/', xadmin.site.urls),
-
+    # 富文本编辑器的路由
+    path("ckeditor/", include("ckeditor_uploader.urls")),
     url(r'media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
     path("home/", include("home.urls")),
     path("user/", include("user.urls")),
+    path("course/", include("course.urls")),
+    path("cart/", include("cart.urls")),
 
 ]

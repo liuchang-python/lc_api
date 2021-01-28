@@ -44,9 +44,15 @@ INSTALLED_APPS = [
     'xadmin',
     'crispy_forms',
     'reversion',
+    'django_filters',
+    # 富文本编辑器配置
+    'ckeditor',  # 富文本编辑器
+    'ckeditor_uploader',  # 富文本编辑器的上传模块
 
     'home',
     'user',
+    'course',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -138,12 +144,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # 允许跨域请求
 CORS_ORIGIN_ALLOW_ALL = True
 
+# 富文本编辑器
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # 展示哪些工具栏
+        'height': 300,  # 编辑器的高度
+    },
+}
+
+CKEDITOR_UPLOAD_PATH = ''
+
 JWT_AUTH = {
     # jwt 登录视图返回的数据的格式
     'JWT_RESPONSE_PAYLOAD_HANDLER':
         'user.utils.jwt_response_payload_handler',
     # token的过期时间
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30000),
 }
 
 # 自定义多条件登录方式
@@ -158,6 +174,39 @@ REST_FRAMEWORK = {
 
 # 注册自定义用户模型
 AUTH_USER_MODEL = "user.UserInfo"
+
+# redis连接配置
+CACHES = {
+    "default": {
+        # 连接的客户端
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 连接的redis的库
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    # 验证码储存位置
+    "sms_code": {
+        # 连接的客户端
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 连接的redis的库
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    # 购物车储存位置
+    "cart": {
+        # 连接的客户端
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 连接的redis的库
+        "LOCATION": "redis://127.0.0.1:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+}
 
 # 日志配置
 LOGGING = {

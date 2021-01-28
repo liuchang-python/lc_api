@@ -140,3 +140,31 @@ dmypy.json
 cython_debug/
 
 
+gt3-python-sdk/README.md
+gt3-python-sdk/README.rst
+gt3-python-sdk/demo/django_demo/app/__init__.py
+gt3-python-sdk/demo/django_demo/app/views.py
+gt3-python-sdk/demo/django_demo/django_demo/__init__.py
+gt3-python-sdk/demo/django_demo/django_demo/settings.py
+gt3-python-sdk/demo/django_demo/django_demo/urls.py
+gt3-python-sdk/demo/django_demo/django_demo/wsgi.py
+gt3-python-sdk/demo/django_demo/geetest/
+gt3-python-sdk/demo/django_demo/manage.py
+gt3-python-sdk/demo/django_demo/requirements.txt
+gt3-python-sdk/demo/django_demo/static/
+gt3-python-sdk/demo/flask_demo/
+gt3-python-sdk/demo/tornado_demo/
+lc_api/apps/home/migrations/0001_initial.py
+lc_api/apps/user/__init__.py
+lc_api/apps/user/admin.py
+lc_api/apps/user/apps.py
+lc_api/apps/user/migrations/0001_initial.py
+lc_api/apps/user/migrations/__init__.py
+lc_api/apps/user/models.py
+lc_api/apps/user/serializers.py
+lc_api/apps/user/tests.py
+lc_api/apps/user/views.py
+lc_api/settings/constants.py
+lc_api/utils/random_code.py
+lc_api/utils/send_message.py
+templates/
