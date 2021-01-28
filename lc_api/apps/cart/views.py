@@ -5,7 +5,7 @@ from rest_framework.viewsets import ViewSet
 from django_redis import get_redis_connection
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-from course.models import Course
+from course.models import Course, CourseExpire
 from lc_api.settings.constants import IMG_SRC
 
 
@@ -80,10 +80,41 @@ class CartViewSet(ViewSet):
                 'name': course.name,
                 'id': course.id,
                 'expire_id': expire_id,
-                'price': course.price,
+                'price': course.real_price,
+                # 当前课程的有效期
+                "expire_text": course.expire_list,
             })
 
         return Response(data)
+
+    def change_expire(self, request):
+        """改变redis中的有效期"""
+        user_id = request.user.id
+        expire_id = request.data.get('expire_id')
+        course_id = request.data.get('course_id')
+        # print(expire_id, course_id)
+
+        try:
+            # 获取对应的课程信息
+            course = Course.objects.get(is_delete=False, is_show=True, pk=course_id)
+
+            # 判断前端传递的有效期选项 如果不是0 则修改课程对应有效期
+            if expire_id > 0:
+                expire_item = CourseExpire.objects.filter(is_show=True, is_delete=False, pk=expire_id)
+                if not expire_item:
+                    raise CourseExpire.DoesNotExist()
+
+        except Course.DoesNotExist:
+            return Response({"message": "课程信息不存在"}, status=status.HTTP_400_BAD_REQUEST)
+
+        connection = get_redis_connection("cart")
+        connection.hset("cart_%s" % user_id, course_id, expire_id)
+
+        # TODO 重新计算切换有效期后的价格
+        price = course.expire_real_price(expire_id)
+
+        return Response({"message": "切换有效期成功","price":price})
+
 
 class CartChangeViewSet(ViewSet):
     # 只有登录且认证的用户才可以访问

@@ -25,7 +25,9 @@ class CourseModelSerializer(ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ["id", "name", "course_img", "students", "lessons", "pub_lessons", "price", "teacher", 'lesson_list']
+        fields = ["id", "name", "course_img", "students", "lessons", "pub_lessons",
+                  "price", "teacher", 'lesson_list', 'discount_name', "real_price",
+                  "active_time"]
 
 
 class CourseDetailModelSerializer(ModelSerializer):
@@ -35,11 +37,13 @@ class CourseDetailModelSerializer(ModelSerializer):
     class Meta:
         model = Course
         fields = ["id", "name", "level_name", "course_img", "students", "lessons",
-                  "pub_lessons", "price", "teacher", 'course_video',"brief_html"]
+                  "pub_lessons", "price", "teacher", 'course_video', "brief_html",
+                  "discount_name", "real_price", "active_time"]
 
 
 class CourseLessonModelSerializer(ModelSerializer):
     """课时序列化器"""
+
     class Meta:
         model = CourseLesson
         fields = ["id", "name", "free_trail"]
