@@ -16,12 +16,12 @@
                 <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
                         <img src="/static/image/cart.svg" alt="">
-                        <span><router-link to="/cart">购物车</router-link></span>
+                        <span><router-link to="/cart">{{this.$store.state.cart_length}}购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
                         <router-link to="/center">个人中心</router-link>
                         &nbsp;|&nbsp;
-                        <span>退出登录</span>
+                        <span @click="log_out">退出登录</span>
                     </div>
                 </div>
 
@@ -34,7 +34,7 @@
                     <div class="login-box full-left">
                         <router-link to="/login">登录</router-link>
                         &nbsp;|&nbsp;
-                        <span>注册</span>
+                        <router-link to="/register">注册</router-link>
                     </div>
                 </div>
             </div>
@@ -71,6 +71,10 @@
             // 获取token
             get_token() {
                 this.token = sessionStorage.getItem("token")
+            },
+            log_out(){
+                sessionStorage.clear();
+                this.$router.go(0);
             },
         },
         created() {

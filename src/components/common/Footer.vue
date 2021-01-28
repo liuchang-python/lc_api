@@ -24,7 +24,7 @@ export default {
                 url: this.$settings.HOST + "home/foot/",
                 method: 'get'
             }).then(res => {
-                console.log(res.data);
+                // console.log(res.data);
                 this.foot_list = res.data;
             }).catch(error => {
                 console.log(error);
