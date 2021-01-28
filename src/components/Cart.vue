@@ -105,8 +105,8 @@
     }
 
     .cart_title .total {
-        font-size: 12px;
-        color: #d0d0d0;
+        font-size: 25px;
+        color: #409EFF;
     }
 
     .cart_table {

@@ -44,10 +44,15 @@
                                 <span class="free" v-if="lesson.free_trail">免费</span>
                             </li>
                         </ul>
-                        <div class="pay-box">
-                            <span class="discount-type">限时免费</span>
-                            <span class="discount-price">￥0.00元</span>
-                            <span class="original-price">原价：{{ course.price }}元</span>
+                        <!--                 优惠活动的展示       -->
+                        <div class="pay-box" v-if="course.discount_name">
+                            <span class="discount-type">{{course.discount_name}}</span>
+                            <span class="discount-price">￥{{course.real_price}}元</span>
+                            <span class="original-price">原价：{{course.price}}元</span>
+                            <span class="buy-now">立即购买</span>
+                        </div>
+                        <div class="pay-box" v-else>
+                            <span class="discount-price">原价：{{course.price}}元</span>
                             <span class="buy-now">立即购买</span>
                         </div>
                     </div>
@@ -127,7 +132,7 @@ export default {
             }
             // 更改排序条件
             this.filters.type = type;
-            // 当排序条件被改变时 需要重新获取排序后的记过
+            // 当排序条件被改变时 需要重新获取排序后的
             this.get_course_list();
         },
 

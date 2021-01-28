@@ -10,15 +10,13 @@
         <div class="cart_column column_3">
 
             <el-select v-model="course.expire_id" size="mini" placeholder="请选择购买有效期" class="my_el_select">
-                <el-option label="1个月有效" :value="30" key="30"></el-option>
-                <el-option label="2个月有效" :value="60" key="60"></el-option>
-                <el-option label="3个月有效" :value="90" key="90"></el-option>
-                <el-option label="永久有效" :value="0" key="10000"></el-option>
+                <el-option v-for="item in course.expire_text" :label="item.expire_text" :value="item.id"
+                           :key="item.id"></el-option>
             </el-select>
         </div>
         <div class="cart_column column_4">¥ {{ course.price }}</div>
-        <div class="cart_column column_4" @click="del_cart">
-            <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
+        <div class="cart_column column_4">
+            <el-button @click="del_cart" type="danger" icon="el-icon-delete" round size="mini"></el-button>
             删除
         </div>
     </div>
@@ -33,8 +31,35 @@ export default {
         "course.selected": function () {
             this.change_selected();
         },
+        // 监测课程对应的有效期id是否发生了改变
+        "course.expire_id": function () {
+            this.change_expire();
+        },
     },
     methods: {
+        // 发起请求，修改redis中的有效期
+        change_expire() {
+            // 向后端发起请求，修改有效期，并获取有效期对应的价格
+            let token = sessionStorage.token || localStorage.token;
+
+            this.$axios.put(this.$settings.HOST + "cart/option/", {
+                // 要修改的有效期id  要修改redis中哪本课程
+                expire_id: this.course.expire_id,
+                course_id: this.course.id
+            }, {
+                headers: {
+                    // 添加购物车需要认证，写到token才能请求到后台
+                    "Authorization": "jwt " + token
+                }
+            }).then(res => {
+                console.log(res.data);
+                // 获取到有效期对应的价格并展示
+                this.course.price = res.data.price;
+                this.$message.success("切换有效期成功")
+            }).catch(error => {
+                console.log(error);
+            })
+        },
         // 在访问购物车之前判断用户是否已经登录
         check_user_login() {
             let token = sessionStorage.token || localStorage.token;

@@ -38,7 +38,7 @@
                             <span class="sms-btn" v-show="!show">{{ count }}</span>
                         </div>
                     </div>
-                    <button class="login_btn">登录</button>
+                    <button class="login_btn" @click="message_login">登录</button>
                     <span class="go_login">没有账号
                     <router-link to="/register">立即注册</router-link>
                 </span>
@@ -68,11 +68,22 @@ export default {
         }
     },
     methods: {
-        pwd_login() {
-            this.login_type = 0;
-
+        // 短信登录
+        message_login() {
+            this.flag = true;
+            this.$axios({
+                url: this.$settings.HOST + "user/phone/",
+                method: 'post',
+                data: {
+                    phone: this.phone,
+                    code: this.code,
+                }
+            }).then(res => {
+                console.log(res.data);
+            }).catch(error => {
+                console.log(error);
+            })
         },
-
         check_phone() {
             //TODO 判断是手机号是否可用
             let rex = /^1[3456789][0-9]{9}/;
@@ -88,8 +99,10 @@ export default {
                 }).then(res => {
                     console.log(res.data);
                     this.flag = true;
+                    this.$alert('可以登录')
                 }).catch(error => {
                     console.log(error);
+                    this.$alert('手机号不可用', '警告');
                 })
             } else {
                 this.flag = false;
@@ -129,6 +142,8 @@ export default {
                 }).catch(error => {
                     console.log(error);
                 })
+            } else {
+                this.$alert('手机号不可用');
             }
         },
         // 请求验证码的回调函数  完成验证码的验证

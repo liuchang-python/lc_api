@@ -43,7 +43,7 @@ export default {
     methods: {
         check_phone() {
             //TODO 判断是手机号是否可用
-            let rex = /^1[3456789]d{9}$/;
+            let rex = /^1[3456789][0-9]{9}/;
             if (rex.test(this.phone)) {
                 this.flag = true;
                 this.$axios({
