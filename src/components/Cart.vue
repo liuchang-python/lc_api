@@ -15,14 +15,16 @@
                     <span class="do_more">操作</span>
                 </div>
                 <div class="cart_course_list">
-                    <CartItem v-for="(course,index) in cart_list" :course="course" :key="index"></CartItem>
+                    <CartItem v-for="(course,index) in cart_list"
+                              :course="course" :key="index"
+                              @change_expire="cart_total_price"></CartItem>
                 </div>
                 <div class="cart_footer_row">
                     <span class="cart_select"><label> <el-checkbox
                         v-model="checked"></el-checkbox><span>全选</span></label></span>
                     <span class="cart_delete"><i class="el-icon-delete"></i> <span>删除</span></span>
-                    <span class="goto_pay">去结算</span>
-                    <span class="cart_total">总计：¥0.0</span>
+                    <span class="goto_pay"><router-link to="/order">去结算</router-link></span>
+                    <span class="cart_total">总计：¥{{total_price}}</span>
                 </div>
             </div>
         </div>
@@ -42,9 +44,21 @@
             return {
                 checked: 0,
                 cart_list: [],
+                total_price: 0.00,  // 购物车中已勾选的课程总价
             }
         },
         methods: {
+            // 计算商品总价
+            cart_total_price() {
+                let total = 0;
+                this.cart_list.forEach((course, key) => {
+                    // 判断商品后是否被选中  选中则计入总价
+                    if (course.selected) {
+                        total += parseFloat(course.price);
+                    }
+                    this.total_price = total;
+                })
+            },
             // 在访问购物车之前判断用户是否已经登录
             check_user_login() {
                 let token = sessionStorage.token || localStorage.token;
@@ -71,7 +85,9 @@
                     console.log(res.data);
                     this.cart_list = res.data;
                     // 向状态机提交一个动作修改购物车数量
-                    this.$store.commit("change_length", this.cart_list.length)
+                    this.$store.commit("change_length", this.cart_list.length);
+                    // 计算商品总价
+                    this.cart_total_price();
                 }).catch(error => {
                     console.log(error);
                 })

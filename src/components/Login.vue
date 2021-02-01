@@ -70,26 +70,53 @@ export default {
     methods: {
         // 短信登录
         message_login() {
-            this.flag = true;
-            this.$axios({
-                url: this.$settings.HOST + "user/phone/",
-                method: 'post',
-                data: {
-                    phone: this.phone,
-                    code: this.code,
-                }
-            }).then(res => {
-                console.log(res.data);
-            }).catch(error => {
-                console.log(error);
-            })
+            if (this.flag) {
+                this.$axios({
+                    url: this.$settings.HOST + "user/login2/",
+                    method: 'post',
+                    data: {
+                        account: this.phone,
+                        code: this.code,
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                    if (res.data.token) {
+                        this.$message({
+                            message: "恭喜你，登录成功",
+                            type: "success",
+                            duration: 1000,
+                        })
+
+                        // 将用户的登录信息保存到sessionStorage，方便回显
+                        sessionStorage.token = res.data.token;
+                        sessionStorage.username = res.data.user.username;
+                        sessionStorage.user_id = res.data.user.id;
+
+                        if (this.remember_me) {
+                            // 将用户的登录信息保存到localStorage，方便回显
+                            localStorage.username = res.data.username;
+                            localStorage.password = this.password;
+                        } else {
+                            localStorage.clear();
+                        }
+
+                        // 登录成功后返回首页
+                        this.$router.push("/")
+                    }
+                }).catch(error => {
+                    console.log(error);
+                })
+            } else {
+                this.$alert('手机号不可用');
+            }
+
         },
+        // 判断是手机号是否可用  user/phone/  get
         check_phone() {
             //TODO 判断是手机号是否可用
             let rex = /^1[3456789][0-9]{9}/;
             console.log(rex, rex.test(this.phone));
             if (rex.test(this.phone)) {
-                this.flag = true;
                 this.$axios({
                     url: this.$settings.HOST + "user/phone/",
                     method: 'get',
@@ -99,7 +126,7 @@ export default {
                 }).then(res => {
                     console.log(res.data);
                     this.flag = true;
-                    this.$alert('可以登录')
+                    // this.$alert('可以登录')
                 }).catch(error => {
                     console.log(error);
                     this.$alert('手机号不可用', '警告');
@@ -109,7 +136,7 @@ export default {
 
             }
         },
-        // 为输入正确的手机号获取验证码
+        // 为输入正确的手机号获取验证码 user/message/  get
         get_code() {
             // TODO 判断当前手机输入的状态是否允许发送短信
             if (!/1[356789]\d{9}/.test(this.phone)) {

@@ -55,6 +55,8 @@ export default {
                 console.log(res.data);
                 // 获取到有效期对应的价格并展示
                 this.course.price = res.data.price;
+                // 当有效期切换时  向父组件提交事件来修改总价
+                this.$emit("change_expire")
                 this.$message.success("切换有效期成功")
             }).catch(error => {
                 console.log(error);
