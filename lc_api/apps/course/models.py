@@ -123,8 +123,10 @@ class Course(BaseModel):
                         # 课程原价减去满足条件最大优惠价格
                         price = self.price - max(price_list)
             return int(price)
+        else:
+            return self.price
 
-    def expire_real_price(self,expire_id):
+    def expire_real_price(self, expire_id):
         # TODO  判断当前 课程是否永久有效
         # 如果是永久有效 直接计算即可
         # 如果是有效期，则找到当前有效期对应的价格，然后再计算优惠活动

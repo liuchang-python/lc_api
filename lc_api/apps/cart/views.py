@@ -80,7 +80,8 @@ class CartViewSet(ViewSet):
                 'name': course.name,
                 'id': course.id,
                 'expire_id': expire_id,
-                'price': course.real_price,
+                # 'price': course.real_price,
+                'price': course.expire_real_price(expire_id),
                 # 当前课程的有效期
                 "expire_text": course.expire_list,
             })
@@ -114,6 +115,64 @@ class CartViewSet(ViewSet):
         price = course.expire_real_price(expire_id)
 
         return Response({"message": "切换有效期成功","price":price})
+
+    def get_select_course(self, request):
+        """获取购物车中已勾选的课程并返回到前端"""
+        user_id = request.user.id
+        redis_connection = get_redis_connection('cart')
+
+        # 获取当前购物车中的所有商品
+        cart_list_byte = redis_connection.hgetall("cart_%s" % user_id)
+        select_list_byte = redis_connection.smembers("selected_%s" % user_id)
+
+        # 循环从mysql中获取课程的信息
+        data = []
+        total_price = 0  # 商品总价
+        for course_id_byte, expire_id_byte in cart_list_byte.items():
+            course_id = int(course_id_byte)
+            expire_id = int(expire_id_byte)
+
+            # 判断商品id是否在已勾选的商品列表中
+            if course_id_byte in select_list_byte:
+                try:
+                    # 获取对应的课程信息
+                    course = Course.objects.get(is_delete=False, is_show=True, pk=course_id)
+                except Course.DoesNotExist:
+                    continue
+
+                # 如果有效期的id大于0，则代表需要重新计算商品的价格，有效期id不大于0，说明是原价
+                original_price = course.price
+                expire_text = "永久有效"
+
+                try:
+                    if expire_id > 0:
+                        course_expire = CourseExpire.objects.get(id=expire_id)
+                        # 对应有效期的价格
+                        original_price = course_expire.price
+                        expire_text = course_expire.expire_text
+                except CourseExpire.DoesNotExist:
+                    pass
+
+                # 根据已勾选的商品对应有效期的价格去计算勾选商品的总价
+                real_expire_price = course.expire_real_price(expire_id)
+
+                # 将购物车中所需的信息返回
+                data.append({
+                    "course_img": IMG_SRC + course.course_img.url,
+                    "name": course.name,
+                    "id": course.id,
+                    "expire_text": expire_text,
+                    # 原价
+                    "price": original_price,
+                    # 活动 有效期计算后的真实价格
+                    "real_price": "%.2f" % float(real_expire_price),
+                    "discount_name": course.discount_name,
+                })
+
+                # 商品叠加后的总价
+                total_price += float(real_expire_price)
+
+        return Response({"course_list": data, "total_price": total_price, "message": "获取成功"})
 
 
 class CartChangeViewSet(ViewSet):
